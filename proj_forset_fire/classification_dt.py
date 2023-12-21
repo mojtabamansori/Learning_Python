@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split, StratifiedKFold, GridSearchCV
-from sklearn.tree import DecisionTreeClassifier
+from sklearn.tree import DecisionTreeClassifier, plot_tree
 from sklearn.metrics import accuracy_score, classification_report
 import matplotlib.pyplot as plt
 
@@ -40,18 +40,29 @@ accuracy = accuracy_score(y_test, y_pred)
 print(f'Accuracy: {accuracy}')
 print(classification_report(y_test, y_pred))
 
-results = pd.DataFrame(grid_search.cv_results_)
+# Save results to CSV
+cv_results_df = pd.DataFrame(grid_search.cv_results_)
+cv_results_df.to_csv('cv_results.csv', index=False)
 
+# Plot Grid Search CV Results
 param_columns = ['param_' + param for param in param_grid.keys()]
 columns = ['mean_test_score'] + param_columns
 plt.figure(figsize=(12, 6))
 for i, params in enumerate(param_columns):
     plt.subplot(1, len(param_columns), i + 1)
-    grouped = results.groupby(params).mean()['mean_test_score']
+    grouped = cv_results_df.groupby(params).mean()['mean_test_score']
     grouped.plot(marker='o')
     plt.title(f'Grid Search CV Results ({params[6:]})')
     plt.xlabel(params[6:])
     plt.ylabel('Mean Test Score')
 
 plt.tight_layout()
+plt.show()
+
+# Plot and save Decision Tree
+plt.figure(figsize=(20, 10))
+feature_names_list = list(X.columns)
+plot_tree(best_dt_classifier, filled=True, feature_names=feature_names_list, class_names=['non-fire', 'fire'])
+plt.title('Best Decision Tree Classifier')
+plt.savefig('best_decision_tree.png')
 plt.show()
