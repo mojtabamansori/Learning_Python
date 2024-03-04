@@ -20,17 +20,14 @@ X_train = np.array(X_train)
 X_test = np.array(X_test)
 y_train = np.array(y_train)
 y_test = np.array(y_test)
-k = 4
-errors = []
 
-for i in range(len(X_test)):
-    print(f"\r{i}/{len(X_test)}",end='')
-    all_distances = np.sqrt(np.sum(np.abs(X_train - X_test[i]) ** 2, axis=1))
-    k_indexes = np.argsort(all_distances)[0:k]
-    centroids = np.mean(y_train[k_indexes, :], axis=0)
-    error = haversine_distances(np.reshape(np.radians(y_test[i]), (1, -1)), np.reshape(np.radians(centroids), (1, -1)))* 6371000
-    errors.append(error)
 
-print(np.mean(errors))
-print(np.median(errors))
+X_train_distance = []
+for i in range(len(X_train)):
+    print(f'\r{i}/{len(X_train)}',end='')
+    all_distances = np.sqrt(np.sum(np.abs(X_train - X_train[i]) ** 2, axis=1))
+    X_train_distance.append(all_distances)
+X_train_distance = np.array(X_train_distance)
 
+df_distance = pd.DataFrame(X_train_distance)
+df_distance.to_csv('X_train_distance.csv', index=False)
